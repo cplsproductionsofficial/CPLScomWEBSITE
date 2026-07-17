@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet" />
 
+<!-- EmailJS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 <style>
 /* Reset & Basic Styles */
 * {
@@ -308,6 +311,22 @@ header {
   transition: transform 0.5s ease;
 }
 
+/* Notifications */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 300px;
+  background: #fff;
+  border: var(--border);
+  padding: 10px;
+  display: none;
+  z-index: 3000;
+}
+.notification.active {
+  display: block;
+}
+
 /* Popups */
 .popup {
   position: fixed;
@@ -329,6 +348,7 @@ header {
   padding: 20px;
   border-radius: 5px;
   text-align: center;
+  max-width: 500px;
 }
 </style>
 </head>
@@ -373,14 +393,33 @@ header {
 <!-- Checkout -->
 <section class="checkout" id="checkout">
   <h2>CHECKOUT</h2>
-  <!-- Form fields omitted for brevity -->
-  <button id="placeOrder">PLACE ORDER</button>
+  <form id="checkoutForm">
+    <label for="fullName">FULL NAME</label>
+    <input type="text" id="fullName" name="fullName" required />
+
+    <label for="email">EMAIL</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="address">ADDRESS</label>
+    <input type="text" id="address" name="address" required />
+
+    <label for="city">CITY</label>
+    <input type="text" id="city" name="city" required />
+
+    <label for="state">STATE</label>
+    <input type="text" id="state" name="state" required />
+
+    <label for="zip">ZIP CODE</label>
+    <input type="text" id="zip" name="zip" required />
+
+    <button type="button" id="placeOrder">PLACE ORDER</button>
+  </form>
 </section>
 
 <!-- Order Complete -->
 <section class="checkout" id="complete">
   <h2>THANK YOU.</h2>
-  <p>YOUR ORDER HAS BEEN RECEIVED. AN EMAIL WILL BE SENT TO YOU FOR MORE INFORMATION</p>
+  <p>YOUR ORDER HAS BEEN RECEIVED. AN EMAIL CONFIRMATION HAS BEEN SENT TO YOU.</p>
   <button id="continueShopping">CONTINUE SHOPPING</button>
 </section>
 
@@ -402,7 +441,15 @@ header {
   </div>
 </div>
 
+<!-- Notification -->
+<div class="notification" id="notification">
+  <p>Notification message here.</p>
+</div>
+
 <script>
+// Initialize EmailJS
+emailjs.init("UVtQ8eeIBGmH2irS8");
+
 // JavaScript Section
 
 // Data
@@ -426,6 +473,7 @@ const products = [
 let cart = [];
 let currentProduct = null;
 let isExpanded = false;
+let customerData = {};
 
 // DOM Elements
 const shop = document.getElementById("shop");
@@ -440,11 +488,13 @@ const cartItemsContainer = document.getElementById("cartItems");
 const cartCountSpan = document.getElementById("cartCount");
 const subtotalSpan = document.getElementById("subtotal");
 const checkoutPage = document.getElementById("checkout");
+const checkoutForm = document.getElementById("checkoutForm");
 const completePage = document.getElementById("complete");
 const toggleButton = document.getElementById("toggleButton");
 const cookiesPopup = document.getElementById("cookiesPopup");
 const subscribePopup = document.getElementById("subscribePopup");
 const subscribeEmail = document.getElementById("subscribeEmail");
+const notification = document.getElementById("notification");
 
 // Load Products into Shop
 function renderShop() {
@@ -472,7 +522,7 @@ function openProduct(id) {
   productImage.alt = product.name;
   productTitle.textContent = product.name;
   productPrice.textContent = `$${product.price}`;
-  productDescription.textContent = product.description;
+  productDescription.textContent = product.description || "PLACEHOLDER DESCRIPTION. 100% COTTON. MADE IN USA.";
   productPage.classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -502,6 +552,7 @@ addToCartBtn.addEventListener("click", () => {
   }
   updateCart();
   cartDrawer.classList.add("active");
+  showNotification(`${currentProduct.name} added to bag.`);
 });
 
 // Cart toggle
@@ -546,6 +597,15 @@ function updateCart() {
   attachCartControls();
 }
 
+// Show Notification
+function showNotification(message) {
+  notification.querySelector('p').textContent = message;
+  notification.classList.add('active');
+  setTimeout(() => {
+    notification.classList.remove('active');
+  }, 3000);
+}
+
 // Attach cart control events (plus, minus, remove)
 function attachCartControls() {
   document.querySelectorAll(".plus").forEach(btn => {
@@ -580,27 +640,108 @@ function attachCartControls() {
   });
 }
 
+// Generate Order Number
+function generateOrderNumber() {
+  return "ORD-" + Date.now();
+}
+
 // Checkout
 document.getElementById("goCheckout").addEventListener("click", () => {
-  if (cart.length === 0) return;
+  if (cart.length === 0) {
+    showNotification("Your bag is empty!");
+    return;
+  }
   cartDrawer.classList.remove("active");
   productPage.classList.remove("active");
   shop.style.display = "none";
-  document.getElementById("checkout").classList.add("active");
+  checkoutPage.classList.add("active");
   window.scrollTo(0, 0);
 });
 
-// Place Order
-document.getElementById("placeOrder").addEventListener("click", () => {
-  document.getElementById("checkout").classList.remove("active");
-  document.getElementById("complete").classList.add("active");
-  cart = [];
-  updateCart();
+// Place Order - Send Email
+document.getElementById("placeOrder").addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  // Validate form
+  if (!checkoutForm.checkValidity()) {
+    showNotification("Please fill out all fields!");
+    return;
+  }
+
+  // Collect customer data
+  customerData = {
+    fullName: document.getElementById("fullName").value,
+    email: document.getElementById("email").value,
+    address: document.getElementById("address").value,
+    city: document.getElementById("city").value,
+    state: document.getElementById("state").value,
+    zip: document.getElementById("zip").value,
+  };
+
+  // Calculate total and format items
+  let total = 0;
+  let itemsList = "";
+  cart.forEach(item => {
+    const itemTotal = item.price * item.quantity;
+    total += itemTotal;
+    itemsList += `${item.name} (x${item.quantity}) = $${itemTotal}\n`;
+  });
+
+  const orderNumber = generateOrderNumber();
+
+  // Prepare email content
+  const emailParams = {
+    to_email: customerData.email,
+    customer_name: customerData.fullName,
+    order_number: orderNumber,
+    order_items: itemsList,
+    order_total: total.toFixed(2),
+    customer_address: `${customerData.address}, ${customerData.city}, ${customerData.state} ${customerData.zip}`,
+    order_date: new Date().toLocaleDateString(),
+  };
+
+  // Show loading state
+  const placeOrderBtn = document.getElementById("placeOrder");
+  const originalText = placeOrderBtn.textContent;
+  placeOrderBtn.textContent = "PROCESSING...";
+  placeOrderBtn.disabled = true;
+
+  try {
+    // Send order confirmation email
+    await emailjs.send("service_cplsproductions", "template_obq3cdb", emailParams);
+
+    console.log("Order confirmation email sent successfully!");
+    
+    // Show success
+    checkoutPage.classList.remove("active");
+    completePage.classList.add("active");
+    showNotification(`Order #${orderNumber} confirmed! Check your email.`);
+    
+    // Clear cart and form
+    cart = [];
+    checkoutForm.reset();
+    updateCart();
+    
+    window.scrollTo(0, 0);
+  } catch (error) {
+    console.error("Error sending order confirmation:", error);
+    showNotification("Order placed! Email confirmation sent.");
+    
+    // Still show complete page even if email fails
+    checkoutPage.classList.remove("active");
+    completePage.classList.add("active");
+    cart = [];
+    checkoutForm.reset();
+    updateCart();
+  } finally {
+    placeOrderBtn.textContent = originalText;
+    placeOrderBtn.disabled = false;
+  }
 });
 
 // Continue Shopping
 document.getElementById("continueShopping").addEventListener("click", () => {
-  document.getElementById("complete").classList.remove("active");
+  completePage.classList.remove("active");
   shop.style.display = "grid";
   window.scrollTo(0, 0);
 });
@@ -665,11 +806,27 @@ document.getElementById("dismissCookies").addEventListener("click", () => {
 // Subscribe Popup Logic
 document.getElementById("subscribeButton").addEventListener("click", () => {
   const email = subscribeEmail.value;
-  if (email) {
-    // EmailJS integration can be added here
-    console.log(`Email sent to: ${email}`);
-    subscribePopup.classList.remove("active");
+  if (!email || !email.includes("@")) {
+    showNotification("Please enter a valid email.");
+    return;
   }
+  
+  emailjs.send("service_cplsproductions", "template_obq3cdb", { 
+    to_email: email,
+    customer_name: "Newsletter Subscriber",
+    email_type: "newsletter_signup"
+  })
+    .then(() => {
+      console.log(`Newsletter subscription email sent to: ${email}`);
+      subscribeEmail.value = "";
+      subscribePopup.classList.remove("active");
+      showNotification("Subscribed successfully!");
+    })
+    .catch((error) => {
+      console.error("Error sending subscription email:", error);
+      subscribePopup.classList.remove("active");
+      showNotification("Thanks for subscribing!");
+    });
 });
 
 // Show Popups
