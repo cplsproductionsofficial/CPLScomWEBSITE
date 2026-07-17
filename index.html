@@ -307,6 +307,29 @@ header {
 .rotate {
   transition: transform 0.5s ease;
 }
+
+/* Popups */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+.popup.active {
+  display: flex;
+}
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -361,6 +384,24 @@ header {
   <button id="continueShopping">CONTINUE SHOPPING</button>
 </section>
 
+<!-- Cookies Popup -->
+<div class="popup" id="cookiesPopup">
+  <div class="popup-content">
+    <p>This website uses cookies to ensure you get the best experience.</p>
+    <button id="acceptCookies">Accept</button>
+    <button id="dismissCookies">Dismiss</button>
+  </div>
+</div>
+
+<!-- Subscribe Popup -->
+<div class="popup" id="subscribePopup">
+  <div class="popup-content">
+    <p>Subscribe to our newsletter for updates!</p>
+    <input type="email" id="subscribeEmail" placeholder="Enter your email" />
+    <button id="subscribeButton">Subscribe</button>
+  </div>
+</div>
+
 <script>
 // JavaScript Section
 
@@ -401,6 +442,9 @@ const subtotalSpan = document.getElementById("subtotal");
 const checkoutPage = document.getElementById("checkout");
 const completePage = document.getElementById("complete");
 const toggleButton = document.getElementById("toggleButton");
+const cookiesPopup = document.getElementById("cookiesPopup");
+const subscribePopup = document.getElementById("subscribePopup");
+const subscribeEmail = document.getElementById("subscribeEmail");
 
 // Load Products into Shop
 function renderShop() {
@@ -609,6 +653,37 @@ toggleButton.addEventListener("click", () => {
 
 // Initialize shop
 renderShop();
+
+// Cookies Popup Logic
+document.getElementById("acceptCookies").addEventListener("click", () => {
+  cookiesPopup.classList.remove("active");
+});
+document.getElementById("dismissCookies").addEventListener("click", () => {
+  cookiesPopup.classList.remove("active");
+});
+
+// Subscribe Popup Logic
+document.getElementById("subscribeButton").addEventListener("click", () => {
+  const email = subscribeEmail.value;
+  if (email) {
+    // EmailJS integration can be added here
+    console.log(`Email sent to: ${email}`);
+    subscribePopup.classList.remove("active");
+  }
+});
+
+// Show Popups
+window.onload = () => {
+  cookiesPopup.classList.add("active");
+  subscribePopup.classList.add("active");
+};
+
+// Disable Safari Zoom In on iPad
+if (/iPad/i.test(navigator.userAgent)) {
+  document.addEventListener('gesturestart', function (e) {
+    e.preventDefault();
+  });
+}
 </script>
 </body>
 </html>
