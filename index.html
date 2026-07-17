@@ -327,29 +327,39 @@ header {
   display: block;
 }
 
-/* Popups */
-.popup {
+/* Mini Popups (stacked mini-notifications at bottom-left) */
+.mini-popup {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 3000;
-}
-.popup.active {
-  display: flex;
-}
-.popup-content {
+  left: 20px;
+  width: 320px;
   background: #fff;
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  max-width: 500px;
+  border: var(--border);
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+  border-radius: 4px;
+  z-index: 3100;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: auto;
 }
+.mini-popup.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.mini-popup .mini-content {
+  text-align: left;
+  font-size: 13px;
+}
+.mini-popup .mini-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* make sure these don't have the old full-screen overlay behavior */
+/* (removed .popup and .popup-content full-screen rules) */
 </style>
 </head>
 <body>
@@ -423,21 +433,25 @@ header {
   <button id="continueShopping">CONTINUE SHOPPING</button>
 </section>
 
-<!-- Cookies Popup -->
-<div class="popup" id="cookiesPopup">
-  <div class="popup-content">
+<!-- Cookies Mini Popup -->
+<div class="mini-popup" id="cookiesPopup">
+  <div class="mini-content">
     <p>This website uses cookies to ensure you get the best experience.</p>
-    <button id="acceptCookies">Accept</button>
-    <button id="dismissCookies">Dismiss</button>
+    <div class="mini-actions">
+      <button id="acceptCookies">Accept</button>
+      <button id="dismissCookies">Dismiss</button>
+    </div>
   </div>
 </div>
 
-<!-- Subscribe Popup -->
-<div class="popup" id="subscribePopup">
-  <div class="popup-content">
+<!-- Subscribe Mini Popup -->
+<div class="mini-popup" id="subscribePopup">
+  <div class="mini-content">
     <p>Subscribe to our newsletter for updates!</p>
     <input type="email" id="subscribeEmail" placeholder="Enter your email" />
-    <button id="subscribeButton">Subscribe</button>
+    <div class="mini-actions">
+      <button id="subscribeButton">Subscribe</button>
+    </div>
   </div>
 </div>
 
@@ -495,6 +509,33 @@ const cookiesPopup = document.getElementById("cookiesPopup");
 const subscribePopup = document.getElementById("subscribePopup");
 const subscribeEmail = document.getElementById("subscribeEmail");
 const notification = document.getElementById("notification");
+
+// Mini popup stack state
+let activeMiniPopups = [];
+function updateMiniPopupPositions() {
+  activeMiniPopups.forEach((el, i) => {
+    // stack upwards; newest on top (index 0)
+    el.style.bottom = `${20 + i * 84}px`;
+    el.style.zIndex = 3100 + (activeMiniPopups.length - i);
+  });
+}
+function showMiniPopup(el) {
+  if (!el) return;
+  if (!activeMiniPopups.includes(el)) {
+    // put newest at front so it appears on top
+    activeMiniPopups.unshift(el);
+  }
+  el.classList.add('active');
+  updateMiniPopupPositions();
+}
+function hideMiniPopup(el) {
+  if (!el) return;
+  const idx = activeMiniPopups.indexOf(el);
+  if (idx !== -1) activeMiniPopups.splice(idx, 1);
+  el.classList.remove('active');
+  el.style.bottom = '';
+  updateMiniPopupPositions();
+}
 
 // Load Products into Shop
 function renderShop() {
@@ -795,12 +836,12 @@ toggleButton.addEventListener("click", () => {
 // Initialize shop
 renderShop();
 
-// Cookies Popup Logic
+// Cookies Popup Logic (now using mini popups)
 document.getElementById("acceptCookies").addEventListener("click", () => {
-  cookiesPopup.classList.remove("active");
+  hideMiniPopup(cookiesPopup);
 });
 document.getElementById("dismissCookies").addEventListener("click", () => {
-  cookiesPopup.classList.remove("active");
+  hideMiniPopup(cookiesPopup);
 });
 
 // Subscribe Popup Logic
@@ -819,20 +860,20 @@ document.getElementById("subscribeButton").addEventListener("click", () => {
     .then(() => {
       console.log(`Newsletter subscription email sent to: ${email}`);
       subscribeEmail.value = "";
-      subscribePopup.classList.remove("active");
+      hideMiniPopup(subscribePopup);
       showNotification("Subscribed successfully!");
     })
     .catch((error) => {
       console.error("Error sending subscription email:", error);
-      subscribePopup.classList.remove("active");
+      hideMiniPopup(subscribePopup);
       showNotification("Thanks for subscribing!");
     });
 });
 
-// Show Popups
+// Show Mini Popups on load (stacked in bottom-left, no gray overlay)
 window.onload = () => {
-  cookiesPopup.classList.add("active");
-  subscribePopup.classList.add("active");
+  showMiniPopup(cookiesPopup);
+  showMiniPopup(subscribePopup);
 };
 
 // Disable Safari Zoom In on iPad
