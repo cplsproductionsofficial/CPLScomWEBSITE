@@ -138,7 +138,7 @@ header {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  cursor: zoom-in;
+  cursor: default;
   background: #fff;
 }
 .product-image img {
@@ -575,6 +575,7 @@ document.getElementById("continueShopping").addEventListener("click", () => {
 });
 
 // Image zoom toggle
+// zoom removed
 let isZoomed = false;
 productImage.addEventListener("click", () => {
   isZoomed = !isZoomed;
