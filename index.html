@@ -60,36 +60,41 @@ header {
   height: 64px;
   padding: 0 24px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   background: #fff;
   border-bottom: var(--border);
   z-index: 1000;
 }
-.logo {
-  font-size: 14px;
-  letter-spacing: 2px;
-}
-.cart-button {
+
+/* Plus Button */
+#toggleGrid {
+  font-size: 24px;
   cursor: pointer;
   user-select: none;
+  display: inline-block;
+  transition: transform 0.5s ease;
 }
 
 /* Shop Grid */
 .shop {
   margin-top: 64px;
   display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+.shop.two-columns {
   grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
 }
+
+/* Products */
 .product {
-  border-right: var(--border);
-  border-bottom: var(--border);
+  border: none; /* No grid lines */
+  padding: 8px;
+  transition: transform 0.2s ease;
   cursor: pointer;
-  transition: opacity var(--transition);
-}
-.product:nth-child(even) {
-  border-right: none;
 }
 .product:hover {
   opacity: 0.75;
@@ -97,23 +102,6 @@ header {
 .product img {
   aspect-ratio: 1/1;
   object-fit: cover;
-}
-.product-info {
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  letter-spacing: 1px;
-}
-
-/* Responsive */
-@media (max-width: 700px) {
-  .shop {
-    grid-template-columns: 1fr;
-  }
-  .product {
-    border-right: none;
-  }
 }
 
 /* Product Page */
@@ -261,51 +249,23 @@ header {
   text-transform: uppercase;
   outline: none;
 }
-#placeOrder {
-  margin-top: 40px;
-  width: 100%;
-  padding: 18px;
-  background-color: #000;
-  color: #fff;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-}
 
-/* Animations */
-.fade {
-  animation: fade 0.3s ease;
+/* Animations for Yeezy-like slide */
+@keyframes slideDown {
+  from { transform: translateY(0); }
+  to { transform: translateY(20px); }
 }
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Responsive adjustments for smaller screens */
-@media(max-width: 900px) {
-  .product-page.active {
-    grid-template-columns: 1fr;
-  }
-  .product-details {
-    border-left: none;
-    border-top: var(--border);
-  }
-  .cart {
-    width: 100%;
-  }
+@keyframes slideUp {
+  from { transform: translateY(20px); }
+  to { transform: translateY(0); }
 }
 </style>
 </head>
 <body>
 
-<!-- Header -->
+<!-- Header with plus button -->
 <header>
-  <div class="logo">SHOP</div>
-  <div class="cart-button" id="openCart">BAG (<span id="cartCount">0</span>)</div>
+  <div class="plus-button" id="toggleGrid" title="Toggle grid size">＋</div>
 </header>
 
 <!-- Shop Grid -->
@@ -353,9 +313,7 @@ header {
 </section>
 
 <script>
-// JavaScript Section
-
-// Data
+// Sample Products Data
 const products = [
   { id: 1, name: "PRODUCT 01", price: 20, image: "https://placehold.co/900x900?text=PRODUCT+01", description: "PLACEHOLDER DESCRIPTION." },
   { id: 2, name: "PRODUCT 02", price: 25, image: "https://placehold.co/900x900?text=PRODUCT+02", description: "PLACEHOLDER DESCRIPTION." },
@@ -387,7 +345,7 @@ const subtotalSpan = document.getElementById("subtotal");
 const checkoutPage = document.getElementById("checkout");
 const completePage = document.getElementById("complete");
 
-// Load Products into Shop
+// Render products
 function renderShop() {
   products.forEach(p => {
     const div = document.createElement("div");
@@ -404,7 +362,7 @@ function renderShop() {
   });
 }
 
-// Open Product Page
+// Open product
 function openProduct(id) {
   const product = products.find(p => p.id === id);
   if (!product) return;
@@ -418,12 +376,12 @@ function openProduct(id) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Close Product Page
+// Close product
 document.getElementById("backButton").addEventListener("click", () => {
   productPage.classList.remove("active");
 });
 
-// Attach product click events
+// Product click event
 shop.addEventListener("click", (e) => {
   const productDiv = e.target.closest(".product");
   if (productDiv) {
@@ -432,7 +390,7 @@ shop.addEventListener("click", (e) => {
   }
 });
 
-// Add to Cart
+// Add to cart
 addToCartBtn.addEventListener("click", () => {
   if (!currentProduct) return;
   const existing = cart.find(p => p.id === currentProduct.id);
@@ -454,7 +412,7 @@ document.getElementById("closeCart").addEventListener("click", () => {
   cartDrawer.classList.remove("active");
 });
 
-// Update Cart
+// Update cart
 function updateCart() {
   cartItemsContainer.innerHTML = "";
   if (cart.length === 0) {
@@ -482,13 +440,6 @@ function updateCart() {
     `;
     cartItemsContainer.appendChild(div);
   });
-  cartCountSpan.textContent = count;
-  subtotalSpan.textContent = `$${total}`;
-  attachCartControls();
-}
-
-// Attach cart control events (plus, minus, remove)
-function attachCartControls() {
   document.querySelectorAll(".plus").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = Number(btn.dataset.id);
@@ -519,10 +470,13 @@ function attachCartControls() {
       updateCart();
     });
   });
+  // Update counts and subtotal
+  cartCountSpan.textContent = count;
+  subtotalSpan.textContent = `$${total}`;
 }
 
-// Open Product Page on product click
-// (Handled by event delegation on shop container)
+// Open product page on click
+// (handled by event delegation)
 
 // Add current product to cart
 document.getElementById("addToCart").addEventListener("click", () => {
@@ -537,17 +491,17 @@ document.getElementById("addToCart").addEventListener("click", () => {
   cartDrawer.classList.add("active");
 });
 
-// Checkout
+// Checkout button
 document.getElementById("goCheckout").addEventListener("click", () => {
   if (cart.length === 0) return;
   cartDrawer.classList.remove("active");
   productPage.classList.remove("active");
-  shop.style.display = "none";
+  document.querySelector(".shop").style.display = "none";
   document.getElementById("checkout").classList.add("active");
   window.scrollTo(0, 0);
 });
 
-// Place Order
+// Place order
 document.getElementById("placeOrder").addEventListener("click", () => {
   document.getElementById("checkout").classList.remove("active");
   document.getElementById("complete").classList.add("active");
@@ -555,10 +509,10 @@ document.getElementById("placeOrder").addEventListener("click", () => {
   updateCart();
 });
 
-// Continue Shopping
+// Continue shopping
 document.getElementById("continueShopping").addEventListener("click", () => {
   document.getElementById("complete").classList.remove("active");
-  shop.style.display = "grid";
+  document.querySelector(".shop").style.display = "grid";
   window.scrollTo(0, 0);
 });
 
@@ -569,28 +523,55 @@ productImage.addEventListener("click", () => {
   productImage.style.transform = isZoomed ? "scale(2)" : "scale(1)";
 });
 
-// ESC key
+// ESC key to close overlays
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     productPage.classList.remove("active");
+    document.getElementById("checkout").classList.remove("active");
+    document.getElementById("complete").classList.remove("active");
     cartDrawer.classList.remove("active");
   }
 });
 
-// Click outside cart
+// Click outside cart to close
 document.addEventListener("click", (e) => {
   if (
-    cartDrawer.classList.contains("active") &&
-    !cartDrawer.contains(e.target) &&
+    document.querySelector(".cart").classList.contains("active") &&
+    !document.querySelector(".cart").contains(e.target) &&
     !e.target.closest("#openCart")
   ) {
-    cartDrawer.classList.remove("active");
+    document.querySelector(".cart").classList.remove("active");
   }
 });
 
-// Initialize shop
+// Render the shop items
 renderShop();
 
+// Toggle grid layout with animation and spin plus button
+const toggleBtn = document.getElementById('toggleGrid');
+const shopContainer = document.getElementById('shop');
+
+let isFourColumn = true;
+
+toggleBtn.addEventListener('click', () => {
+  // Animate spin
+  toggleBtn.style.transition = 'transform 0.5s ease';
+  toggleBtn.style.transform = 'rotate(80deg)';
+  
+  // Animate slide down
+  shopContainer.style.transition = 'transform 0.3s ease';
+  shopContainer.style.transform = 'translateY(-20px)';
+  
+  setTimeout(() => {
+    // Toggle grid class
+    shopContainer.classList.toggle('two-columns');
+    isFourColumn = !isFourColumn;
+    // Reset transformation
+    shopContainer.style.transform = 'translateY(0)';
+    // Rotate back with opposite direction
+    toggleBtn.style.transform = 'rotate(0deg)';
+  }, 500);
+});
 </script>
 </body>
 </html>
