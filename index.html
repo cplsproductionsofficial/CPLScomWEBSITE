@@ -79,8 +79,9 @@ header {
 .shop {
   margin-top: 64px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1px;
+  transition: grid-template-columns 0.5s ease;
 }
 .product {
   border-right: var(--border);
@@ -298,13 +299,18 @@ header {
     width: 100%;
   }
 }
+
+/* Animation for the toggle button */
+.rotate {
+  transition: transform 0.5s ease;
+}
 </style>
 </head>
 <body>
 
 <!-- Header -->
 <header>
-  <div class="logo">SHOP</div>
+  <div class="logo" id="toggleButton">+</div>
   <div class="cart-button" id="openCart">BAG (<span id="cartCount">0</span>)</div>
 </header>
 
@@ -367,10 +373,15 @@ const products = [
   { id: 8, name: "PRODUCT 08", price: 55, image: "https://placehold.co/900x900?text=PRODUCT+08", description: "PLACEHOLDER DESCRIPTION." },
   { id: 9, name: "PRODUCT 09", price: 60, image: "https://placehold.co/900x900?text=PRODUCT+09", description: "PLACEHOLDER DESCRIPTION." },
   { id: 10, name: "PRODUCT 10", price: 65, image: "https://placehold.co/900x900?text=PRODUCT+10", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 11, name: "PRODUCT 11", price: 70, image: "https://placehold.co/900x900?text=PRODUCT+11", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 12, name: "PRODUCT 12", price: 75, image: "https://placehold.co/900x900?text=PRODUCT+12", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 13, name: "PRODUCT 13", price: 80, image: "https://placehold.co/900x900?text=PRODUCT+13", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 14, name: "PRODUCT 14", price: 85, image: "https://placehold.co/900x900?text=PRODUCT+14", description: "PLACEHOLDER DESCRIPTION." },
 ];
 
 let cart = [];
 let currentProduct = null;
+let isExpanded = false;
 
 // DOM Elements
 const shop = document.getElementById("shop");
@@ -386,6 +397,7 @@ const cartCountSpan = document.getElementById("cartCount");
 const subtotalSpan = document.getElementById("subtotal");
 const checkoutPage = document.getElementById("checkout");
 const completePage = document.getElementById("complete");
+const toggleButton = document.getElementById("toggleButton");
 
 // Load Products into Shop
 function renderShop() {
@@ -586,6 +598,14 @@ document.addEventListener("click", (e) => {
   ) {
     cartDrawer.classList.remove("active");
   }
+});
+
+// Toggle shop layout
+toggleButton.addEventListener("click", () => {
+  isExpanded = !isExpanded;
+  const newLayout = isExpanded ? "repeat(2, 1fr)" : "repeat(4, 1fr)";
+  shop.style.gridTemplateColumns = newLayout;
+  toggleButton.classList.toggle("rotate");
 });
 
 // Initialize shop
