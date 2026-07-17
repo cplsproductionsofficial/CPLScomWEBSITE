@@ -689,14 +689,14 @@ document.getElementById("placeOrder").addEventListener("click", async (e) => {
 
   const orderNumber = generateOrderNumber();
 
-  // Prepare email content
+  // Prepare email content - Updated parameter names to match EmailJS template
   const emailParams = {
     to_email: customerData.email,
     customer_name: customerData.fullName,
     order_number: orderNumber,
     order_items: itemsList,
     order_total: total.toFixed(2),
-    customer_address: `${customerData.address}, ${customerData.city}, ${customerData.state} ${customerData.zip}`,
+    recipient_address: `${customerData.address}, ${customerData.city}, ${customerData.state} ${customerData.zip}`,
     order_date: new Date().toLocaleDateString(),
   };
 
