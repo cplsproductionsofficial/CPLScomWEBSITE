@@ -725,15 +725,26 @@ document.getElementById("placeOrder").addEventListener("click", async (e) => {
   const orderNumber = generateOrderNumber();
 
   // Prepare email content - Updated parameter names to match EmailJS template
-  const emailParams = {
-    to_email: customerData.email,
-    customer_name: customerData.fullName,
-    order_number: orderNumber,
-    order_items: itemsList,
-    order_total: total.toFixed(2),
-    recipient_address: `${customerData.address}, ${customerData.city}, ${customerData.state} ${customerData.zip}`,
-    order_date: new Date().toLocaleDateString(),
-  };
+const shipping = 0;
+const tax = 0;
+
+const emailParams = {
+  to_email: customerData.email,
+
+  order_id: orderNumber,
+
+  orders: cart.map(item => ({
+    name: item.name,
+    units: item.quantity,
+    price: item.price.toFixed(2)
+  })),
+
+  cost: {
+    shipping: shipping.toFixed(2),
+    tax: tax.toFixed(2),
+    total: (total + shipping + tax).toFixed(2)
+  }
+};
 
   // Show loading state
   const placeOrderBtn = document.getElementById("placeOrder");
@@ -741,11 +752,15 @@ document.getElementById("placeOrder").addEventListener("click", async (e) => {
   placeOrderBtn.textContent = "PROCESSING...";
   placeOrderBtn.disabled = true;
 
-  try {
-    // Send order confirmation email
-    await emailjs.send("service_cplsproductions", "template_obq3cdb", emailParams);
+try {
+  // Send order confirmation email
+  await emailjs.send(
+    "service_cplsproductions",
+    "template_obq3cdb",
+    emailParams
+  );
 
-    console.log("Order confirmation email sent successfully!");
+  console.log("Order confirmation email sent successfully!");
     
     // Show success
     checkoutPage.classList.remove("active");
