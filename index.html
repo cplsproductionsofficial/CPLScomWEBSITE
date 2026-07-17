@@ -3,362 +3,504 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Shop Grid Toggle</title>
+<title>SHOP</title>
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet" />
 
 <style>
-  /* Basic styles */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: "IBM Plex Mono", monospace;
-    background: #fff;
-    color: #000;
-    text-transform: uppercase;
-    overflow-x: hidden;
-  }
+/* Reset & Basic Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: "IBM Plex Mono", monospace;
+  background: #fff;
+  color: #000;
+  text-transform: uppercase;
+  overflow-x: hidden;
+}
 
-  /* Header with toggle button */
-  header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 64px;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border-bottom: 1px solid #000;
-    z-index: 10;
-  }
+/* Buttons & Images */
+button {
+  font: inherit;
+  background: none;
+  border: 1px solid black;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #eee;
+}
+img {
+  display: block;
+  width: 100%;
+}
 
-  #toggleButton {
-    font-size: 24px;
-    cursor: pointer;
-    user-select: none;
-    padding: 10px;
-    transition: transform 0.5s ease;
-  }
+/* Variables */
+:root {
+  --border: 1px solid #000;
+  --padding: 20px;
+  --transition: 0.25s ease;
+}
 
-  /* Shop grid styles */
+/* Header */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-bottom: var(--border);
+  z-index: 1000;
+}
+.logo {
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+.cart-button {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Shop Grid */
+.shop {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+}
+.product {
+  border-right: var(--border);
+  border-bottom: var(--border);
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.product:nth-child(even) {
+  border-right: none;
+}
+.product:hover {
+  opacity: 0.75;
+}
+.product img {
+  aspect-ratio: 1/1;
+  object-fit: cover;
+}
+.product-info {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
   .shop {
-    margin-top: 64px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    padding: 10px;
-    transition: all 0.3s ease;
+    grid-template-columns: 1fr;
   }
-  .shop.two-columns {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* Product item styles */
   .product {
-    background: #f0f0f0;
-    padding: 8px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    border-right: none;
   }
-  .product img {
+}
+
+/* Product Page */
+.product-page {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 64px);
+  background: #fff;
+  display: none;
+  overflow: auto;
+  z-index: 900;
+}
+.product-page.active {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+}
+.product-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  cursor: zoom-in;
+  background: #fff;
+}
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+  transform-origin: center;
+}
+.product-details {
+  border-left: var(--border);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.product-title {
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+.product-price {
+  font-size: 14px;
+}
+.product-description {
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+.add-button {
+  width: 100%;
+  padding: 18px;
+  font-size: 18px;
+  margin-top: auto;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+/* Cart Drawer */
+.cart {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 420px;
+  max-width: 100%;
+  height: 100vh;
+  background: #fff;
+  border-left: var(--border);
+  transition: right 0.35s ease;
+  padding: 24px;
+  overflow: auto;
+  z-index: 2000;
+}
+.cart.active {
+  right: 0;
+}
+.cart-title {
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+.cart-item {
+  padding: 20px 0;
+  border-bottom: var(--border);
+}
+.cart-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.qty-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border);
+}
+.remove {
+  margin-top: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  color: red;
+}
+.subtotal {
+  margin-top: 32px;
+  font-size: 15px;
+}
+.checkout-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 18px;
+}
+
+/* Checkout */
+.checkout {
+  display: none;
+  padding: 120px 10vw 80px;
+  max-width: 800px;
+  margin: auto;
+}
+.checkout.active {
+  display: block;
+}
+.checkout h2 {
+  margin-bottom: 40px;
+  font-size: 18px;
+}
+.checkout label {
+  display: block;
+  margin-top: 24px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+.checkout input {
+  width: 100%;
+  padding: 16px;
+  border: var(--border);
+  font: inherit;
+  text-transform: uppercase;
+  outline: none;
+}
+#placeOrder {
+  margin-top: 40px;
+  width: 100%;
+  padding: 18px;
+  background-color: #000;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Animations */
+.fade {
+  animation: fade 0.3s ease;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments for smaller screens */
+@media(max-width: 900px) {
+  .product-page.active {
+    grid-template-columns: 1fr;
+  }
+  .product-details {
+    border-left: none;
+    border-top: var(--border);
+  }
+  .cart {
     width: 100%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
   }
-  .product span {
-    margin-top: 8px;
-  }
-
-  /* Cart styles */
-  #cart {
-    position: fixed;
-    top: 0;
-    right: -400px;
-    width: 400px;
-    height: 100%;
-    background: #fff;
-    border-left: 1px solid #000;
-    padding: 20px;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
-    transition: right 0.3s ease;
-    z-index: 20;
-    overflow-y: auto;
-  }
-  #cart.active {
-    right: 0;
-  }
-  #cart h2 {
-    margin-bottom: 20px;
-  }
-  #cart .cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-  #cart .cart-item div {
-    display: flex;
-    flex-direction: column;
-  }
-  #cart .controls {
-    display: flex;
-    gap: 5px;
-  }
-  #cart button {
-    padding: 4px 8px;
-  }
-  #cart .remove {
-    color: red;
-    cursor: pointer;
-  }
-
-  /* Product page styles */
- #productPage {
-    display: none;
-    position: fixed;
-    top: 64px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 64px);
-    background: #fff;
-    display: grid;
-    grid-template-columns: 1fr 420px;
-    z-index: 30;
-    overflow: auto;
-  }
-  #productPage.active {
-    display: grid;
-  }
-  #productImageContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-  #productImageContainer img {
-    max-width: 100%;
-    max-height: 80vh;
-  }
-  #productDetails {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  #backButton {
-    align-self: flex-start;
-    cursor: pointer;
-    background: none;
-    border: 1px solid #000;
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-  #addToCart {
-    background: #000;
-    color: #fff;
-    padding: 12px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-  }
-
-  /* Checkout styles */
-#checkout, #complete {
-    display: none;
-    padding: 40px 20px;
-    max-width: 600px;
-    margin: auto;
-    margin-top: 80px;
-  }
-#checkout.active, #complete.active {
-    display: block;
-  }
-  #goCheckout, #placeOrder, #continueShopping {
-    padding: 12px 24px;
-    font-size: 16px;
-    margin-top: 20px;
-    cursor: pointer;
-  }
-
+}
 </style>
 </head>
 <body>
 
-<!-- Header with toggle button -->
+<!-- Header -->
 <header>
-  <div id="toggleButton" title="Toggle grid size">＋</div>
-  <button style="margin-left:20px;" id="viewCartBtn">View Cart</button>
+  <div class="logo">SHOP</div>
+  <div class="cart-button" id="openCart">BAG (<span id="cartCount">0</span>)</div>
 </header>
 
-<!-- Shop grid -->
-<main class="shop" id="shop"></main>
+<!-- Shop Grid -->
+<main class="shop" id="shop">
+  <!-- Product Items will be dynamically generated here -->
+</main>
 
 <!-- Product Page -->
-<div id="productPage">
-  <div id="productImageContainer">
-    <img id="productImage" src="" alt="Product" />
+<section class="product-page" id="productPage">
+  <div class="product-image">
+    <img id="productImage" src="" alt="PRODUCT" />
   </div>
-  <div id="productDetails">
-    <button id="backButton">← Back</button>
-    <div><strong id="productTitle">Product</strong></div>
-    <div id="productPrice">$0</div>
-    <div id="productDescription">PLACEHOLDER DESCRIPTION. 100% COTTON. MADE IN USA.</div>
-    <button id="addToCart">ADD TO BAG</button>
+  <div class="product-details">
+    <button id="backButton">← BACK</button>
+    <div class="product-title" id="productTitle">PRODUCT</div>
+    <div class="product-price" id="productPrice">$0</div>
+    <div class="product-description" id="productDescription">PLACEHOLDER DESCRIPTION. 100% COTTON. MADE IN USA.</div>
+    <button class="add-button" id="addToCart">ADD TO BAG</button>
   </div>
-</div>
+</section>
 
 <!-- Cart Drawer -->
-<div id="cart">
-  <h2>BAG</h2>
-  <div id="cartItems">YOUR BAG IS EMPTY.</div>
-  <div style="margin-top:20px;">SUBTOTAL <div id="subtotal">$0</div></div>
-  <button id="goCheckout">CHECKOUT</button>
-</div>
+<aside class="cart" id="cart">
+  <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+    <div class="cart-title">BAG</div>
+    <button id="closeCart">✕</button>
+  </div>
+  <div id="cartItems"><p>YOUR BAG IS EMPTY.</p></div>
+  <div class="subtotal">SUBTOTAL <div id="subtotal">$0</div></div>
+  <button class="checkout-button" id="goCheckout">CHECKOUT</button>
+</aside>
 
 <!-- Checkout -->
-<div id="checkout">
+<section class="checkout" id="checkout">
   <h2>CHECKOUT</h2>
-  <p>Implement checkout form here.</p>
+  <!-- Form fields omitted for brevity -->
   <button id="placeOrder">PLACE ORDER</button>
-</div>
+</section>
 
-<!-- Completion -->
-<div id="complete">
+<!-- Order Complete -->
+<section class="checkout" id="complete">
   <h2>THANK YOU.</h2>
   <p>YOUR ORDER HAS BEEN RECEIVED.</p>
   <button id="continueShopping">CONTINUE SHOPPING</button>
-</div>
+</section>
 
 <script>
+// JavaScript Section
+
+// Data
 const products = [
-  { id: 1, name: "PRODUCT 01", price: 20, image: "https://placehold.co/600x600?text=PRODUCT+01", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 2, name: "PRODUCT 02", price: 25, image: "https://placehold.co/600x600?text=PRODUCT+02", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 3, name: "PRODUCT 03", price: 30, image: "https://placehold.co/600x600?text=PRODUCT+03", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 4, name: "PRODUCT 04", price: 35, image: "https://placehold.co/600x600?text=PRODUCT+04", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 5, name: "PRODUCT 05", price: 40, image: "https://placehold.co/600x600?text=PRODUCT+05", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 6, name: "PRODUCT 06", price: 45, image: "https://placehold.co/600x600?text=PRODUCT+06", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 7, name: "PRODUCT 07", price: 50, image: "https://placehold.co/600x600?text=PRODUCT+07", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 8, name: "PRODUCT 08", price: 55, image: "https://placehold.co/600x600?text=PRODUCT+08", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 9, name: "PRODUCT 09", price: 60, image: "https://placehold.co/600x600?text=PRODUCT+09", description: "PLACEHOLDER DESCRIPTION." },
-  { id: 10, name: "PRODUCT 10", price: 65, image: "https://placehold.co/600x600?text=PRODUCT+10", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 1, name: "PRODUCT 01", price: 20, image: "https://placehold.co/900x900?text=PRODUCT+01", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 2, name: "PRODUCT 02", price: 25, image: "https://placehold.co/900x900?text=PRODUCT+02", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 3, name: "PRODUCT 03", price: 30, image: "https://placehold.co/900x900?text=PRODUCT+03", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 4, name: "PRODUCT 04", price: 35, image: "https://placehold.co/900x900?text=PRODUCT+04", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 5, name: "PRODUCT 05", price: 40, image: "https://placehold.co/900x900?text=PRODUCT+05", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 6, name: "PRODUCT 06", price: 45, image: "https://placehold.co/900x900?text=PRODUCT+06", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 7, name: "PRODUCT 07", price: 50, image: "https://placehold.co/900x900?text=PRODUCT+07", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 8, name: "PRODUCT 08", price: 55, image: "https://placehold.co/900x900?text=PRODUCT+08", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 9, name: "PRODUCT 09", price: 60, image: "https://placehold.co/900x900?text=PRODUCT+09", description: "PLACEHOLDER DESCRIPTION." },
+  { id: 10, name: "PRODUCT 10", price: 65, image: "https://placehold.co/900x900?text=PRODUCT+10", description: "PLACEHOLDER DESCRIPTION." },
 ];
 
 let cart = [];
 let currentProduct = null;
 
-const shop = document.getElementById('shop');
-const productPage = document.getElementById('productPage');
-const productImage = document.getElementById('productImage');
-const productTitle = document.getElementById('productTitle');
-const productPrice = document.getElementById('productPrice');
-const productDescription = document.getElementById('productDescription');
+// DOM Elements
+const shop = document.getElementById("shop");
+const productPage = document.getElementById("productPage");
+const productImage = document.getElementById("productImage");
+const productTitle = document.getElementById("productTitle");
+const productPrice = document.getElementById("productPrice");
+const productDescription = document.getElementById("productDescription");
+const addToCartBtn = document.getElementById("addToCart");
+const cartDrawer = document.getElementById("cart");
+const cartItemsContainer = document.getElementById("cartItems");
+const cartCountSpan = document.getElementById("cartCount");
+const subtotalSpan = document.getElementById("subtotal");
+const checkoutPage = document.getElementById("checkout");
+const completePage = document.getElementById("complete");
 
-const cartDiv = document.getElementById('cart');
-const cartItemsDiv = document.getElementById('cartItems');
-const subtotalDiv = document.getElementById('subtotal');
-
-const checkoutDiv = document.getElementById('checkout');
-const completeDiv = document.getElementById('complete');
-
-const toggleButton = document.getElementById('toggleButton');
-const viewCartBtn = document.getElementById('viewCartBtn');
-
-let isFourColumns = true;
-
-// Render products
+// Load Products into Shop
 function renderShop() {
   products.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'product';
+    const div = document.createElement("div");
+    div.className = "product";
     div.dataset.id = p.id;
     div.innerHTML = `
       <img src="${p.image}" alt="${p.name}" />
-      <span>${p.name}</span>
-      <span>$${p.price}</span>
+      <div class="product-info">
+        <span>${p.name}</span>
+        <span>$${p.price}</span>
+      </div>
     `;
     shop.appendChild(div);
   });
 }
 
-// Show product
-function showProduct(id) {
-  const prod = products.find(p => p.id === id);
-  if (!prod) return;
-  currentProduct = prod;
-  productImage.src = prod.image;
-  productImage.alt = prod.name;
-  productTitle.textContent = prod.name;
-  productPrice.textContent = `$${prod.price}`;
-  productDescription.textContent = prod.description;
-  productPage.classList.add('active');
+// Open Product Page
+function openProduct(id) {
+  const product = products.find(p => p.id === id);
+  if (!product) return;
+  currentProduct = product;
+  productImage.src = product.image;
+  productImage.alt = product.name;
+  productTitle.textContent = product.name;
+  productPrice.textContent = `$${product.price}`;
+  productDescription.textContent = product.description;
+  productPage.classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Close product
-document.querySelector('#backButton').addEventListener('click', () => {
-  productPage.classList.remove('active');
+// Close Product Page
+document.getElementById("backButton").addEventListener("click", () => {
+  productPage.classList.remove("active");
 });
 
-// Add product click event
-shop.addEventListener('click', e => {
-  const productDiv = e.target.closest('.product');
+// Attach product click events
+shop.addEventListener("click", (e) => {
+  const productDiv = e.target.closest(".product");
   if (productDiv) {
     const id = Number(productDiv.dataset.id);
-    showProduct(id);
+    openProduct(id);
   }
 });
 
-// Add to cart
-document.getElementById('addToCart').addEventListener('click', () => {
+// Add to Cart
+addToCartBtn.addEventListener("click", () => {
   if (!currentProduct) return;
   const existing = cart.find(p => p.id === currentProduct.id);
-  if (existing) existing.quantity++;
-  else cart.push({ ...currentProduct, quantity: 1 });
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({ ...currentProduct, quantity: 1 });
+  }
   updateCart();
+  cartDrawer.classList.add("active");
 });
 
-// Update cart display
+// Cart toggle
+document.getElementById("openCart").addEventListener("click", () => {
+  updateCart();
+  cartDrawer.classList.add("active");
+});
+document.getElementById("closeCart").addEventListener("click", () => {
+  cartDrawer.classList.remove("active");
+});
+
+// Update Cart
 function updateCart() {
-  cartItemsDiv.innerHTML = '';
+  cartItemsContainer.innerHTML = "";
   if (cart.length === 0) {
-    cartItemsDiv.innerHTML = 'YOUR BAG IS EMPTY.';
-    document.getElementById('subtotal').textContent = '$0';
+    cartItemsContainer.innerHTML = "<p>YOUR BAG IS EMPTY.</p>";
+    cartCountSpan.textContent = 0;
+    subtotalSpan.textContent = "$0";
     return;
   }
   let total = 0;
+  let count = 0;
   cart.forEach(item => {
     total += item.price * item.quantity;
-    const div = document.createElement('div');
-    div.className = 'cart-item';
+    count += item.quantity;
+    const div = document.createElement("div");
+    div.className = "cart-item";
     div.innerHTML = `
-      <div>
-        <strong>${item.name}</strong><br/>
-        $${item.price} x ${item.quantity}
-      </div>
-      <div class="controls">
+      <div class="cart-name">${item.name}</div>
+      <div>$${item.price}</div>
+      <div class="cart-controls">
         <button class="minus" data-id="${item.id}">−</button>
+        <span>${item.quantity}</span>
         <button class="plus" data-id="${item.id}">+</button>
-        <div class="remove" data-id="${item.id}">Remove</div>
       </div>
+      <div class="remove" data-id="${item.id}">REMOVE</div>
     `;
-    cartItemsDiv.appendChild(div);
+    cartItemsContainer.appendChild(div);
   });
-  document.querySelectorAll('.plus').forEach(btn => {
-    btn.onclick = () => {
+  cartCountSpan.textContent = count;
+  subtotalSpan.textContent = `$${total}`;
+  attachCartControls();
+}
+
+// Attach cart control events (plus, minus, remove)
+function attachCartControls() {
+  document.querySelectorAll(".plus").forEach(btn => {
+    btn.addEventListener("click", () => {
       const id = Number(btn.dataset.id);
       const item = cart.find(p => p.id === id);
       if (item) {
         item.quantity++;
         updateCart();
       }
-    };
+    });
   });
-  document.querySelectorAll('.minus').forEach(btn => {
-    btn.onclick = () => {
+  document.querySelectorAll(".minus").forEach(btn => {
+    btn.addEventListener("click", () => {
       const id = Number(btn.dataset.id);
       const item = cart.find(p => p.id === id);
       if (item) {
@@ -368,63 +510,85 @@ function updateCart() {
         }
         updateCart();
       }
-    };
+    });
   });
-  document.querySelectorAll('.remove').forEach(btn => {
-    btn.onclick = () => {
+  document.querySelectorAll(".remove").forEach(btn => {
+    btn.addEventListener("click", () => {
       const id = Number(btn.dataset.id);
       cart = cart.filter(p => p.id !== id);
       updateCart();
-    };
+    });
   });
-  document.getElementById('subtotal').textContent = `$${total}`;
 }
 
-// Show cart
-document.getElementById('viewCartBtn').onclick = () => {
+// Open Product Page on product click
+// (Handled by event delegation on shop container)
+
+// Add current product to cart
+document.getElementById("addToCart").addEventListener("click", () => {
+  if (!currentProduct) return;
+  const existing = cart.find(p => p.id === currentProduct.id);
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({ ...currentProduct, quantity: 1 });
+  }
   updateCart();
-  cartDiv.classList.toggle('active');
-};
+  cartDrawer.classList.add("active");
+});
 
 // Checkout
-document.getElementById('goCheckout').onclick = () => {
-  cartDiv.classList.remove('active');
-  document.querySelector('.shop').style.display='none';
-  document.getElementById('checkout').className='active';
-  window.scrollTo(0,0);
-};
-document.getElementById('placeOrder').onclick = () => {
-  document.getElementById('checkout').className='';
-  document.getElementById('complete').className='active';
+document.getElementById("goCheckout").addEventListener("click", () => {
+  if (cart.length === 0) return;
+  cartDrawer.classList.remove("active");
+  productPage.classList.remove("active");
+  shop.style.display = "none";
+  document.getElementById("checkout").classList.add("active");
+  window.scrollTo(0, 0);
+});
+
+// Place Order
+document.getElementById("placeOrder").addEventListener("click", () => {
+  document.getElementById("checkout").classList.remove("active");
+  document.getElementById("complete").classList.add("active");
   cart = [];
   updateCart();
-};
-document.getElementById('continueShopping').onclick = () => {
-  document.getElementById('complete').className='';
-  document.querySelector('.shop').style.display='grid';
-  window.scrollTo(0,0);
-};
+});
 
-// Toggle grid layout & spin plus button
-toggleButton.onclick = () => {
-  // Spin 80 degrees
-  toggleButton.style.transition = 'transform 0.5s ease';
-  toggleButton.style.transform = 'rotate(80deg)';
-  // Animate slide down
-  shop.style.transition = 'transform 0.3s ease';
-  shop.style.transform = 'translateY(-20px)';
-  
-  setTimeout(() => {
-    // Toggle grid class
-    shop.classList.toggle('two-columns');
-    // Reset transform
-    shop.style.transform = 'translateY(0)';
-    // Spin back to original
-    toggleButton.style.transform = 'rotate(0deg)';
-  }, 500);
-};
+// Continue Shopping
+document.getElementById("continueShopping").addEventListener("click", () => {
+  document.getElementById("complete").classList.remove("active");
+  shop.style.display = "grid";
+  window.scrollTo(0, 0);
+});
 
-// Generate items
+// Image zoom toggle
+let isZoomed = false;
+productImage.addEventListener("click", () => {
+  isZoomed = !isZoomed;
+  productImage.style.transform = isZoomed ? "scale(2)" : "scale(1)";
+});
+
+// ESC key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    productPage.classList.remove("active");
+    cartDrawer.classList.remove("active");
+  }
+});
+
+// Click outside cart
+document.addEventListener("click", (e) => {
+  if (
+    cartDrawer.classList.contains("active") &&
+    !cartDrawer.contains(e.target) &&
+    !e.target.closest("#openCart")
+  ) {
+    cartDrawer.classList.remove("active");
+  }
+});
+
+// Initialize shop
 renderShop();
 
 </script>
