@@ -834,44 +834,36 @@ function animateGrid(expanded) {
   const cards = [...document.querySelectorAll(".product")];
   if (!cards.length) return;
 
-  // Fade out
-  shop.classList.add('fading');
+  // Save positions before layout changes
+  const first = cards.map(card => card.getBoundingClientRect());
 
-  setTimeout(() => {
-    // Save positions before layout changes
-    const first = cards.map(card => card.getBoundingClientRect());
+  // Change the grid
+  shop.style.gridTemplateColumns = getTargetColumns(expanded);
 
-    // Change the grid
-    shop.style.gridTemplateColumns = getTargetColumns(expanded);
+  requestAnimationFrame(() => {
+    const last = cards.map(card => card.getBoundingClientRect());
 
-    requestAnimationFrame(() => {
-      const last = cards.map(card => card.getBoundingClientRect());
+    cards.forEach((card, i) => {
+      const dx = first[i].left - last[i].left;
+      const dy = first[i].top - last[i].top;
 
-      cards.forEach((card, i) => {
-        const dx = first[i].left - last[i].left;
-        const dy = first[i].top - last[i].top;
-
-        card.animate(
-          [
-            {
-              transform: `translate(${dx}px, ${dy}px)`
-            },
-            {
-              transform: "translate(0,0)"
-            }
-          ],
+      card.animate(
+        [
           {
-            duration: 550,
-            easing: "cubic-bezier(.22,.61,.36,1)",
-            fill: "both"
+            transform: `translate(${dx}px, ${dy}px)`
+          },
+          {
+            transform: "translate(0,0)"
           }
-        );
-      });
+        ],
+        {
+          duration: 550,
+          easing: "cubic-bezier(.22,.61,.36,1)",
+          fill: "both"
+        }
+      );
     });
-
-    // Fade back in
-    shop.classList.remove('fading');
-  }, 275);
+  });
 }
 
 // Toggle button behavior (update symbol, aria, and grid)
@@ -947,12 +939,37 @@ window.addEventListener('load', () => {
   showMiniPopup(subscribePopup);
 });
 
-// Disable Safari Zoom In on iPad
-if (/iPad/i.test(navigator.userAgent)) {
-  document.addEventListener('gesturestart', function (e) {
-    e.preventDefault();
-  });
-}
+// Handle iPad Safari gestures - map pinch to toggle button behavior
+let lastDistance = 0;
+document.addEventListener('touchmove', function(e) {
+  if (e.touches.length === 2) {
+    const touch1 = e.touches[0];
+    const touch2 = e.touches[1];
+    const distance = Math.hypot(
+      touch2.clientX - touch1.clientX,
+      touch2.clientY - touch1.clientY
+    );
+    
+    if (lastDistance !== 0) {
+      const delta = distance - lastDistance;
+      
+      // Zoom in (spread gesture) - expand grid
+      if (delta > 20 && !isExpanded) {
+        e.preventDefault();
+        toggleButton.click();
+      }
+      // Zoom out (pinch gesture) - collapse grid
+      else if (delta < -20 && isExpanded) {
+        e.preventDefault();
+        toggleButton.click();
+      }
+    }
+    
+    lastDistance = distance;
+  } else {
+    lastDistance = 0;
+  }
+}, { passive: false });
 </script>
 </body>
 </html>
