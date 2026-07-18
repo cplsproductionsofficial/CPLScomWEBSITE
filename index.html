@@ -530,6 +530,20 @@ const products = [
 { id: 21, name: "TS-01", price: 15, image: "A6771C0B-EEFD-4E70-B7C5-861EF7A2144D.png"},
   
 ];
+  products.forEach(product => {
+  if (
+    product.name.startsWith("RS") ||
+    product.name.startsWith("SL")
+  ) {
+    product.category = "footwear";
+  } else if (
+    product.name.startsWith("BT")
+  ) {
+    product.category = "accessories";
+  } else {
+    product.category = "men";
+  }
+});
 
 let cart = [];
 let currentProduct = null;
