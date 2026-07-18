@@ -497,7 +497,8 @@ const products = [
 
 let cart = [];
 let currentProduct = null;
-let isExpanded = false;
+let gridMode = 2;
+const gridModes = [2, 3, 6, 12];
 let customerData = {};
 
 // DOM Elements
@@ -836,11 +837,21 @@ document.addEventListener("click", (e) => {
 });
 
 // Improved grid animation that respects responsive breakpoints
-function getTargetColumns(expanded) {
+function getTargetColumns() {
   const w = window.innerWidth;
-  if (w <= 700) return '1fr';
-  if (w <= 900) return expanded ? 'repeat(3, minmax(0,1fr))' : 'repeat(2, minmax(0,1fr))';
-  return expanded ? 'repeat(3, minmax(0,1fr))' : 'repeat(6, minmax(0,1fr))';
+
+  // Mobile
+  if (w <= 700) return "1fr";
+
+  // Tablet
+  if (w <= 900) {
+    return `repeat(${Math.min(gridMode, 4)}, minmax(0,1fr))`;
+  }
+
+  // Desktop
+  return `repeat(${gridMode}, minmax(0,1fr))`;
+}0,1fr))';
+  
 }
 function animateGrid(expanded) {
   const cards = [...document.querySelectorAll(".product")];
@@ -912,13 +923,16 @@ toggleButton.addEventListener('click', () => {
 });
 
 // Allow keyboard toggling
-toggleButton.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    toggleButton.click();
-  }
-});
+toggleButton.addEventListener("click", () => {
+  const index = gridModes.indexOf(gridMode);
+  gridMode = gridModes[(index + 1) % gridModes.length];
 
+  toggleButton.textContent = gridMode;
+  toggleButton.classList.add("rotate");
+
+  animateGrid();
+});
+  
 // Product image zoom toggle (click to zoom in/out)
 productImageWrap.addEventListener('click', () => {
   const isZoomed = productImageWrap.classList.toggle('zoomed');
