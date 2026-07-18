@@ -857,15 +857,35 @@ function animateGrid(expanded) {
             transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`
           },
           {
-            transform: "translate(0,0) scale(1,1)"
+            transform: "translate(0,0) scale(1)"
           }
         ],
         {
-          duration: 550,
+          duration: 650,
           easing: "cubic-bezier(.22,.61,.36,1)",
           fill: "both"
         }
       );
+
+      const img = card.querySelector("img");
+
+      if (img) {
+        img.animate(
+          [
+            {
+              transform: `scale(${1 / scaleX})`
+            },
+            {
+              transform: "scale(1)"
+            }
+          ],
+          {
+            duration: 650,
+            easing: "cubic-bezier(.22,.61,.36,1)",
+            fill: "both"
+          }
+        );
+      }
     });
   });
 }
