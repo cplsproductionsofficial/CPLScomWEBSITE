@@ -936,9 +936,13 @@ function animateGrid() {
       );
 
       function animateFilter(filter) {
-  const cards = [...document.querySelectorAll(".product")];
 
-  const first = cards.map(card => card.getBoundingClientRect());
+  const oldCards = [...document.querySelectorAll(".product")];
+
+  const first = oldCards.map(card => ({
+    id: card.dataset.id,
+    rect: card.getBoundingClientRect()
+  }));
 
   shop.classList.add("fading");
 
@@ -948,23 +952,45 @@ function animateGrid() {
 
     const newCards = [...document.querySelectorAll(".product")];
 
-    const last = newCards.map(card => card.getBoundingClientRect());
+    newCards.forEach(card => {
 
-    newCards.forEach((card, i) => {
+      const old = first.find(
+        item => item.id === card.dataset.id
+      );
 
-      if (!first[i]) return;
+      if (!old) {
+        card.animate(
+          [
+            {
+              opacity: 0,
+              transform: "scale(0.9)"
+            },
+            {
+              opacity: 1,
+              transform: "scale(1)"
+            }
+          ],
+          {
+            duration: 500,
+            easing: "cubic-bezier(.22,.61,.36,1)"
+          }
+        );
+        return;
+      }
 
-      const dx = first[i].left - last[i].left;
-      const dy = first[i].top - last[i].top;
+      const last = card.getBoundingClientRect();
 
-      const scaleX = first[i].width / last[i].width;
-      const scaleY = first[i].height / last[i].height;
+      const dx = old.rect.left - last.left;
+      const dy = old.rect.top - last.top;
+
+      const scaleX = old.rect.width / last.width;
+      const scaleY = old.rect.height / last.height;
 
       card.animate(
         [
           {
             transform:
-              `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`
+              `translate(${dx}px,${dy}px) scale(${scaleX},${scaleY})`
           },
           {
             transform:
@@ -984,30 +1010,6 @@ function animateGrid() {
 
   }, 200);
 }
-
-      const img = card.querySelector("img");
-
-      if (img) {
-        img.animate(
-          [
-            {
-              transform: `scale(${1 / scaleX})`
-            },
-            {
-              transform: "scale(1)"
-            }
-          ],
-          {
-            duration: 650,
-            easing: "cubic-bezier(.22,.61,.36,1)",
-            fill: "both"
-          }
-        );
-      }
-    });
-  });
-}
-
 // Toggle button behavior (update symbol, aria, and grid)
 toggleButton.addEventListener('click', () => {
   const index = gridModes.indexOf(gridMode);
