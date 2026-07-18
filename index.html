@@ -375,8 +375,8 @@ header {
     <button id="backButton">← BACK</button>
     <div class="product-title" id="productTitle">PRODUCT</div>
     <div class="product-price" id="productPrice">$0</div>
-    <div class="product-description" id="productDescription">PLACEHOLDER DESCRIPTION. 100% COTTON. MADE IN USA.</div>
-    <button class="add-button" id="addToCart">ADD TO BAG</button>
+    <div class="product-description" id="productDescription"></div>
+    <button class="add-button" id="addToCart">ADD TO CART</button>
   </div>
 </section>
 
@@ -386,7 +386,7 @@ header {
     <div class="cart-title">BAG</div>
     <button id="closeCart">✕</button>
   </div>
-  <div id="cartItems"><p>YOUR BAG IS EMPTY.</p></div>
+  <div id="cartItems"><p>YOUR CART IS EMPTY.</p></div>
   <div class="subtotal">SUBTOTAL <div id="subtotal">$0</div></div>
   <button class="checkout-button" id="goCheckout">CHECKOUT</button>
 </aside>
@@ -395,8 +395,11 @@ header {
 <section class="checkout" id="checkout">
   <h2>CHECKOUT</h2>
   <form id="checkoutForm">
-    <label for="fullName">FULL NAME</label>
+    <label for="firstName">FIRST NAME</label>
     <input type="text" id="fullName" name="fullName" required />
+
+        <label for="lastNamr">FIRST NAME</label>
+    <input type="text" id="lastName" name="lastName" required />
 
     <label for="email">EMAIL</label>
     <input type="email" id="email" name="email" required />
@@ -412,6 +415,9 @@ header {
 
     <label for="zip">ZIP CODE</label>
     <input type="text" id="zip" name="zip" required />
+
+    <label for="card">CARD</label>
+    <input type="text" id="card" name="card" required />
 
     <button type="button" id="placeOrder">PLACE ORDER</button>
   </form>
@@ -462,8 +468,8 @@ const products = [
   { id: 1, name: "DM-DVD1", price: 20, image: "https://placehold.co/900x900?text=PRODUCT+01"},
   { id: 2, name: "DM-DVD2", price: 20, image: "https://placehold.co/900x900?text=PRODUCT+02"},
   { id: 3, name: "DM-DVD3", price: 30, image: "https://placehold.co/900x900?text=PRODUCT+03"},
-  { id: 4, name: "XAL-CD1", price: 10, image: "https://placehold.co/900x900?text=PRODUCT+04"},
-  { id: 5, name: "XAL-CD2", price: 10, image: "https://placehold.co/900x900?text=PRODUCT+05"},
+  { id: 4, name: "XAL-CD1", price: 10, image: "21E11BC9-3CFE-4ED9-82CC-06F6426CA086.jpeg"},
+  { id: 5, name: "XAL-CD2", price: 10, image: "21E11BC9-3CFE-4ED9-82CC-06F6426CA086.jpeg"},
   { id: 6, name: "TS-01", price: 20, image: "https://placehold.co/900x900?text=PRODUCT+06"},
   { id: 7, name: "TS-02", price: 20, image: "https://placehold.co/900x900?text=PRODUCT+07"},
   { id: 8, name: "PSTR-01", price: 20, image: "https://placehold.co/900x900?text=PRODUCT+08"},
