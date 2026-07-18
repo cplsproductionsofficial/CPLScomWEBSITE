@@ -88,9 +88,37 @@ header {
   user-select: none;
 }
 
+
+.tabs{
+  position:fixed;
+  top:64px;
+  left:0;
+  width:100%;
+  height:52px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:48px;
+  background:#fff;
+  z-index:999;
+}
+.tab{
+  border:none;
+  background:none;
+  padding:0;
+  margin:0;
+  font:inherit;
+  font-size:14px;
+  letter-spacing:2px;
+  cursor:pointer;
+  transition:opacity .2s ease;
+}
+.tab:hover{background:none;opacity:.6;}
+.tab.active{opacity:1;}
+
 /* Shop Grid */
 .shop {
-  margin-top: 64px;
+  margin-top: 116px;
   display: grid;
   grid-template-columns: repeat(6, minmax(0,1fr));
   gap: 1px;
@@ -368,6 +396,14 @@ header {
 </header>
 
 <!-- Shop Grid -->
+<nav class="tabs">
+  <button class="tab active" data-filter="new">NEW</button>
+  <button class="tab" data-filter="men">MEN</button>
+  <button class="tab" data-filter="women">WOMEN</button>
+  <button class="tab" data-filter="footwear">FOOTWEAR</button>
+  <button class="tab" data-filter="accessories">ACCESSORIES</button>
+</nav>
+
 <main class="shop" id="shop">
   <!-- Product Items will be dynamically generated here -->
 </main>
@@ -378,7 +414,7 @@ header {
     <img id="productImage" src="" alt="PRODUCT" />
   </div>
   <div class="product-details">
-    <button id="backButton">â BACK</button>
+    <button id="backButton">Ã¢ÂÂ BACK</button>
     <div class="product-title" id="productTitle">PRODUCT</div>
     <div class="product-price" id="productPrice">$0</div>
     <div class="product-description" id="productDescription"></div>
@@ -390,7 +426,7 @@ header {
 <aside class="cart" id="cart">
   <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
     <div class="cart-title">BAG</div>
-    <button id="closeCart">â</button>
+    <button id="closeCart">Ã¢ÂÂ</button>
   </div>
   <div id="cartItems"><p>YOUR CART IS EMPTY.</p></div>
   <div class="subtotal">SUBTOTAL <div id="subtotal">$0</div></div>
@@ -639,7 +675,7 @@ function updateCart() {
       <div class="cart-name">${item.name}</div>
       <div>$${item.price}</div>
       <div class="cart-controls">
-        <button class="minus" data-id="${item.id}">â</button>
+        <button class="minus" data-id="${item.id}">Ã¢ÂÂ</button>
         <span>${item.quantity}</span>
         <button class="plus" data-id="${item.id}">+</button>
       </div>
