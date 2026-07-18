@@ -601,19 +601,26 @@ function hideMiniPopup(el) {
 }
 
 // Load Products into Shop
-function renderShop() {
-  products.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "product";
-    div.dataset.id = p.id;
-    div.innerHTML = `
-      <img src="${p.image}" alt="${p.name}" />
-      <div class="product-info">
-        <span>${p.name}</span>
-      </div>
-    `;
-    shop.appendChild(div);
-  });
+function renderShop(filter = "new") {
+  shop.innerHTML = "";
+
+  products
+    .filter(p => filter === "new" || p.category === filter)
+    .forEach(p => {
+
+      const div = document.createElement("div");
+      div.className = "product";
+      div.dataset.id = p.id;
+
+      div.innerHTML = `
+        <img src="${p.image}" alt="${p.name}" />
+        <div class="product-info">
+          <span>${p.name}</span>
+        </div>
+      `;
+
+      shop.appendChild(div);
+    });
 }
 
 // Open Product Page
