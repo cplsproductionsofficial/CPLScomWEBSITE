@@ -107,9 +107,11 @@ header {
 .product img {
   aspect-ratio: 1/1;
   object-fit: cover;
-  transition: transform 0.35s ease;
+  transition:
+    transform 550ms cubic-bezier(.22,.61,.36,1),
+    opacity 0.35s ease;
 }
-.product-info {
+  .product-info {
   padding: 16px;
   display: flex;
   justify-content: space-between;
