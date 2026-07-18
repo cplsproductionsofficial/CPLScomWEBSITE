@@ -154,6 +154,17 @@ header {
 .product-page.active {
   display: grid;
   grid-template-columns: 1fr 420px;
+  animation: zoomInCamera 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+@keyframes zoomInCamera {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .product-image {
   display: flex;
@@ -298,15 +309,6 @@ header {
   font-size: 16px;
   border: none;
   cursor: pointer;
-}
-
-/* Animations */
-.fade {
-  animation: fade 0.7 ease;
-}
-@keyframes fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 /* Responsive adjustments for smaller screens */
