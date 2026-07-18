@@ -93,7 +93,7 @@ header {
 .shop {
   margin-top: 64px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
+  grid-template-columns: repeat(6, minmax(0,1fr));
   gap: 1px;
   transition: grid-template-columns 0.70s ease;
 }
@@ -114,8 +114,12 @@ header {
   .product-info {
   padding: 32px;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   font-size: 16px;
   letter-spacing: 2px;
+  text-align: center;
 }
 
 /* Responsive */
@@ -541,7 +545,6 @@ function renderShop() {
       <img src="${p.image}" alt="${p.name}" />
       <div class="product-info">
         <span>${p.name}</span>
-        <span>$${p.price}</span>
       </div>
     `;
     shop.appendChild(div);
@@ -822,8 +825,8 @@ document.addEventListener("click", (e) => {
 function getTargetColumns(expanded) {
   const w = window.innerWidth;
   if (w <= 700) return '1fr';
-  if (w <= 900) return expanded ? 'repeat(2, minmax(0,1fr))' : 'repeat(2, minmax(0,1fr))';
-  return expanded ? 'repeat(2, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr))';
+  if (w <= 900) return expanded ? 'repeat(3, minmax(0,1fr))' : 'repeat(2, minmax(0,1fr))';
+  return expanded ? 'repeat(3, minmax(0,1fr))' : 'repeat(6, minmax(0,1fr))';
 }
 
 function animateGrid(expanded) {
