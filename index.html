@@ -94,9 +94,14 @@ header {
   display: grid;
   grid-template-columns: repeat(6, minmax(0,1fr));
   gap: 1px;
-  transition: grid-template-columns 0.70s ease;
   opacity: 1;
-  transition: grid-template-columns 0.70s ease, opacity 0.55s ease;
+
+  transform-origin: center top;
+
+  transition:
+    grid-template-columns 0.70s ease,
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(.22,.61,.36,1);
 }
 .shop.fading {
   opacity: 0;
@@ -827,15 +832,13 @@ function getTargetColumns(expanded) {
   if (w <= 900) return expanded ? 'repeat(3, minmax(0,1fr))' : 'repeat(2, minmax(0,1fr))';
   return expanded ? 'repeat(3, minmax(0,1fr))' : 'repeat(6, minmax(0,1fr))';
 }
-
 function animateGrid(expanded) {
   const cards = [...document.querySelectorAll(".product")];
   if (!cards.length) return;
 
-  // Save positions before layout changes
   const first = cards.map(card => card.getBoundingClientRect());
 
-  // Change the grid
+  // Change the grid layout
   shop.style.gridTemplateColumns = getTargetColumns(expanded);
 
   requestAnimationFrame(() => {
@@ -845,13 +848,16 @@ function animateGrid(expanded) {
       const dx = first[i].left - last[i].left;
       const dy = first[i].top - last[i].top;
 
+      const scaleX = first[i].width / last[i].width;
+      const scaleY = first[i].height / last[i].height;
+
       card.animate(
         [
           {
-            transform: `translate(${dx}px, ${dy}px)`
+            transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`
           },
           {
-            transform: "translate(0,0)"
+            transform: "translate(0,0) scale(1,1)"
           }
         ],
         {
