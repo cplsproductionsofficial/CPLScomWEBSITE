@@ -88,6 +88,151 @@ header {
   user-select: none;
 }
 
+  .bottom-panel{
+
+    position:fixed;
+
+    bottom:0;
+    left:0;
+
+    height:56px;
+
+    width:56px;
+
+    overflow:hidden;
+
+    background:#fff;
+
+    border-top:1px solid #000;
+    border-right:1px solid #000;
+
+    transition:
+    width .45s cubic-bezier(.77,0,.18,1);
+
+    z-index:9999;
+
+}
+
+.bottom-panel.open{
+
+    width:420px;
+
+}
+
+.panel-toggle{
+
+    width:56px;
+    height:56px;
+
+    border:none;
+
+    background:#fff;
+
+    position:relative;
+
+    cursor:pointer;
+
+}
+
+.panel-toggle span{
+
+    position:absolute;
+
+    width:14px;
+    height:2px;
+
+    background:#000;
+
+    left:22px;
+
+    transition:
+    transform .45s cubic-bezier(.77,0,.18,1);
+
+}
+
+/* > */
+
+.panel-toggle span:nth-child(1){
+
+    transform:
+    rotate(45deg);
+
+    top:22px;
+
+}
+
+.panel-toggle span:nth-child(2){
+
+    transform:
+    rotate(-45deg);
+
+    top:31px;
+
+}
+
+/* X */
+
+.bottom-panel.open span:nth-child(1){
+
+    transform:
+    rotate(45deg);
+
+    top:27px;
+
+}
+
+.bottom-panel.open span:nth-child(2){
+
+    transform:
+    rotate(-45deg);
+
+    top:27px;
+
+}
+
+.panel-content{
+
+    position:absolute;
+
+    left:56px;
+
+    top:0;
+
+    height:56px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:42px;
+
+    white-space:nowrap;
+
+    opacity:0;
+
+    transition:
+    opacity .2s ease .18s;
+
+}
+
+.bottom-panel.open .panel-content{
+
+    opacity:1;
+
+}
+
+.panel-content a{
+
+    color:#000;
+
+    text-decoration:none;
+
+    font-size:13px;
+
+    letter-spacing:1px;
+
+}
+
 /* Shop Grid */
 .shop {
   margin-top: 64px;
@@ -982,6 +1127,25 @@ document.addEventListener('touchmove', function(e) {
     lastDistance = 0;
   }
 }, { passive: false });
+
+  <div class="bottom-panel" id="bottomPanel">
+
+    <button id="panelToggle" class="panel-toggle" aria-label="Open menu">
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="panel-content">
+
+        <a href="#">SHOP</a>
+        <a href="#">ARCHIVE</a>
+        <a href="#">ABOUT</a>
+        <a href="#">CONTACT</a>
+
+    </div>
+
+</div>
+  
 </script>
 </body>
 </html>
